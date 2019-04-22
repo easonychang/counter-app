@@ -14,14 +14,14 @@ class Counters extends Component {
         console.log("Counters - Rendered");
 
         //Destructuring to replace this.props
-        const {onReset, counters, onDelete, onIncrement } = this.props;
+        const {onReset, onGenerateNew, counters, onDelete, onIncrement } = this.props;
 
         return ( 
             <div>
                 <button
                     onClick={onReset} 
                     className="btn btn-primary btn-sm m-2">Reset</button>
-                <button className="btn btn-primary btn-sm m-2">Generate New Set</button>
+                <button onClick={onGenerateNew}  className="btn btn-primary btn-sm m-2">Generate New Set</button>
                 {
                     counters.map(counter => 
                         <Counter 

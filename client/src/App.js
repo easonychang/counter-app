@@ -4,6 +4,7 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Counters from './components/counters';
 import NavBar from './components/navbar';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
 class App extends Component {
 
@@ -13,7 +14,8 @@ class App extends Component {
         { id: 2, value: 0, name: "", imageUrl:""},
         { id: 3, value: 0, name: "", imageUrl:""},
         { id: 4, value: 0, name: "", imageUrl:""}
-    ]
+    ],
+    data: null
   };
 
   constructor(){
@@ -24,11 +26,34 @@ class App extends Component {
 
   }
 
+  // handling fetching of pokemons
+  handleAPICall = res => {
+    const counters = [...this.state.counters];
+    console.log(res);
+    for(let i = 0, j = 0; i < counters.length, j < res.length; i++, j++){
+      counters[i].name = res[j].name;
+      counters[i].imageUrl = res[j].imageUrl;
+    }
+    this.setState({ counters });
+  }
+
   componentDidMount() {
-    //Ajax Call
-    //this.setState({ });
+
+    this.callBackendAPI()
+      .then(res => this.handleAPICall(res))
+      .catch(err => console.log(err));
     console.log("App - Mounted");
   }
+
+  callBackendAPI = async () => {
+    const response = await fetch('/pokemon');
+    const body = await response.json();
+
+    if (response.status !== 200) {
+      throw Error(body.message) 
+    }
+    return body;
+  };
 
   handleIncrement = counter => {
       //console.log(counter);
@@ -47,6 +72,12 @@ class App extends Component {
       this.setState({ counters })
   };
 
+  handleGenerateNew = () => {
+    this.callBackendAPI()
+      .then(res => this.handleAPICall(res))
+      .catch(err => console.log(err));
+};
+
   handleDelete = (counterId) => {
       //console.log("Event Hadnler Called", counterId);
       const counters = this.state.counters.filter(c => c.id !== counterId);
@@ -63,8 +94,10 @@ class App extends Component {
             counters={this.state.counters}
             onReset={this.handleReset}
             onIncrement={this.handleIncrement}
-            onDelete={this.handleDelete} />
+            onDelete={this.handleDelete}
+            onGenerateNew={this.handleGenerateNew} />
         </main>
+        <p className="App-intro">{this.state.data}</p>
       </React.Fragment>
     );
   }
